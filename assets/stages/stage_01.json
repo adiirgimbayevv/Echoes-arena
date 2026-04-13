@@ -1,0 +1,44 @@
+{
+  "stageId": 1,
+  "name": "Forsaken Outpost",
+  "mapPath": "maps/stage_01.tmx",
+  "musicPath": "audio/music/stage_01.ogg",
+  "hasBoss": false,
+  "bossType": "",
+  "spawnPoints": [
+    { "id": "sp_north",     "x": 160.0, "y": 160.0 },
+    { "id": "sp_south",     "x": 160.0, "y": 20.0  },
+    { "id": "sp_east",      "x": 300.0, "y": 90.0  },
+    { "id": "sp_west",      "x": 20.0,  "y": 90.0  },
+    { "id": "sp_northeast", "x": 290.0, "y": 155.0 },
+    { "id": "sp_northwest", "x": 30.0,  "y": 155.0 }
+  ],
+  "waves": [
+    {
+      "waveIndex": 0,
+      "delayBeforeWave": 2.0,
+      "entries": [
+        { "enemyType": "GRUNT", "spawnPointId": "sp_north", "count": 3, "interval": 0.4 },
+        { "enemyType": "GRUNT", "spawnPointId": "sp_south", "count": 2, "interval": 0.4 }
+      ]
+    },
+    {
+      "waveIndex": 1,
+      "delayBeforeWave": 3.0,
+      "entries": [
+        { "enemyType": "SWARM",   "spawnPointId": "sp_east",      "count": 5, "interval": 0.2 },
+        { "enemyType": "GRUNT",   "spawnPointId": "sp_west",      "count": 2, "interval": 0.5 },
+        { "enemyType": "SUPPORT", "spawnPointId": "sp_northeast", "count": 1, "interval": 0.0 }
+      ]
+    },
+    {
+      "waveIndex": 2,
+      "delayBeforeWave": 3.5,
+      "entries": [
+        { "enemyType": "TANK",   "spawnPointId": "sp_north",     "count": 1, "interval": 0.0 },
+        { "enemyType": "SWARM",  "spawnPointId": "sp_northwest", "count": 4, "interval": 0.25 },
+        { "enemyType": "SNIPER", "spawnPointId": "sp_east",      "count": 1, "interval": 0.0 }
+      ]
+    }
+  ]
+}
