@@ -1,0 +1,131 @@
+Ñòðóêòóðà ïàïîê
+Ñåðèéíûé íîìåð òîìà: 90C0-DB36
+C:\USERS\ADI20\ONEDRIVE\DESKTOP\ECHOESARENA\ECHOES-ARENA\CORE\SRC\MAIN\JAVA
+L---com
+    L---patternforge
+        L---echoesarena
+            ¦   EchoesArenaGame.java
+            ¦   
+            +---ability
+            ¦       Ability.java
+            ¦       AbilityComboResolver.java
+            ¦       AbilityFactory.java
+            ¦       AbilityService.java
+            ¦       AbilitySlot.java
+            ¦       AbilityType.java
+            ¦       ActiveAbility.java
+            ¦       ElementProgress.java
+            ¦       ElementType.java
+            ¦       PassiveAbility.java
+            ¦       UltimateAbility.java
+            ¦       
+            +---combat
+            ¦       CollisionSystem.java
+            ¦       CombatSystem.java
+            ¦       DamageCalculator.java
+            ¦       HitData.java
+            ¦       HitType.java
+            ¦       StatusEffect.java
+            ¦       StatusEffectFactory.java
+            ¦       StatusEffectSystem.java
+            ¦       StatusEffectType.java
+            ¦       
+            +---config
+            ¦       BalanceConfig.java
+            ¦       GameConfig.java
+            ¦       
+            +---core
+            ¦       AssetService.java
+            ¦       AudioService.java
+            ¦       EventBus.java
+            ¦       GameContext.java
+            ¦       ProceduralAssets.java
+            ¦       SaveService.java
+            ¦       ScreenRouter.java
+            ¦       
+            +---enemy
+            ¦   ¦   EnemyFactory.java
+            ¦   ¦   EnemyState.java
+            ¦   ¦   EnemyStateMachine.java
+            ¦   ¦   EnemyType.java
+            ¦   ¦   
+            ¦   L---ai
+            ¦           ChaseStrategy.java
+            ¦           EnemyStrategy.java
+            ¦           RangedStrategy.java
+            ¦           SupportStrategy.java
+            ¦           SwarmStrategy.java
+            ¦           TankStrategy.java
+            ¦           
+            +---entity
+            ¦       Enemy.java
+            ¦       Player.java
+            ¦       Projectile.java
+            ¦       
+            +---magic
+            ¦       Element.java
+            ¦       ManaSystem.java
+            ¦       
+            +---player
+            ¦       PlayerBuild.java
+            ¦       PlayerClass.java
+            ¦       PlayerController.java
+            ¦       PlayerSelection.java
+            ¦       PlayerState.java
+            ¦       PlayerStateMachine.java
+            ¦       
+            +---progression
+            ¦       LevelUpService.java
+            ¦       MetaProgression.java
+            ¦       StatPointAllocator.java
+            ¦       UnlockService.java
+            ¦       UpgradeBranch.java
+            ¦       UpgradeCategory.java
+            ¦       UpgradeOption.java
+            ¦       UpgradePool.java
+            ¦       UpgradeTarget.java
+            ¦       
+            +---screens
+            ¦       ArenaObstacle.java
+            ¦       BootScreen.java
+            ¦       GameOverScreen.java
+            ¦       GameplayScreen.java
+            ¦       HealthPickup.java
+            ¦       MainMenuScreen.java
+            ¦       PauseScreen.java
+            ¦       VictoryRoomScreen.java
+            ¦       
+            +---stats
+            ¦       CombatStats.java
+            ¦       MagicalStats.java
+            ¦       ManaProfile.java
+            ¦       PhysicalStats.java
+            ¦       
+            +---ui
+            ¦       HudView.java
+            ¦       PauseView.java
+            ¦       SkillStatsView.java
+            ¦       StageResultView.java
+            ¦       UpgradeChoiceView.java
+            ¦       UpgradeTreeView.java
+            ¦       
+            +---weapon
+            ¦       FocusWeapon.java
+            ¦       MeleeWeapon.java
+            ¦       RangedWeapon.java
+            ¦       Weapon.java
+            ¦       WeaponAttackContext.java
+            ¦       WeaponCompatibilityService.java
+            ¦       WeaponFactory.java
+            ¦       WeaponType.java
+            ¦       
+            L---world
+                    MapLoader.java
+                    SpawnPoint.java
+                    SpawnService.java
+                    StageDefinition.java
+                    StageDirector.java
+                    StageRepository.java
+                    WaveDefinition.java
+                    WaveDirector.java
+                    

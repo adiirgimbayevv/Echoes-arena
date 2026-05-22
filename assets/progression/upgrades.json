@@ -1,0 +1,59 @@
+{
+  "upgrades": [
+    {
+      "id": "hp_boost_small",
+      "displayName": "Vitality",
+      "description": "+15 Max HP",
+      "category": "PHYSICAL",
+      "target": "MAX_HP",
+      "value": 15.0,
+      "isPercentage": false
+    },
+    {
+      "id": "damage_up",
+      "displayName": "Sharpened Edge",
+      "description": "+10% Damage",
+      "category": "PHYSICAL",
+      "target": "DAMAGE_MULTIPLIER",
+      "value": 0.10,
+      "isPercentage": true
+    },
+    {
+      "id": "spell_power_up_small",
+      "displayName": "Arcane Focus",
+      "description": "+10 Spell Power",
+      "category": "MAGICAL",
+      "target": "SPELL_POWER",
+      "value": 10.0,
+      "isPercentage": false
+    },
+    {
+      "id": "cdr_up",
+      "displayName": "Nimble Casting",
+      "description": "+8% CDR",
+      "category": "MAGICAL",
+      "target": "ABILITY_CDR",
+      "value": 0.08,
+      "isPercentage": true
+    },
+    {
+      "id": "mana_regen_up",
+      "displayName": "Meditation",
+      "description": "+2 Mana/s",
+      "category": "MANA",
+      "target": "MANA_REGEN",
+      "value": 2.0,
+      "isPercentage": false
+    },
+    {
+      "id": "combo_fire_ice",
+      "displayName": "Steam Burst",
+      "description": "Unlock Fire+Ice combo element",
+      "category": "COMBO",
+      "target": "SPELL_POWER",
+      "value": 0.0,
+      "isPercentage": false,
+      "requiredUnlockId": null
+    }
+  ]
+}
