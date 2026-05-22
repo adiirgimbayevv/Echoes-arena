@@ -10,17 +10,20 @@ import java.util.Map;
 
 public class AudioService implements Disposable {
 
-    public static final String MUSIC_MENU = "audio/music/menu_theme.wav";
-    public static final String MUSIC_ARENA = "audio/music/arena_pulse.wav";
+    public static final String MUSIC_MENU = "audio/sfx/MainMenuMusic.mp3";
+    public static final String MUSIC_ARENA = "audio/sfx/MainMenuMusic.mp3";
 
     public static final String SFX_BUTTON = "audio/sfx/ui_select.wav";
-    public static final String SFX_PLAYER_ATTACK = "audio/sfx/player_attack.wav";
-    public static final String SFX_ENEMY_HIT = "audio/sfx/enemy_hit.wav";
-    public static final String SFX_ENEMY_KILL = "audio/sfx/enemy_kill.wav";
+    public static final String SFX_PLAYER_ATTACK = "audio/sfx/laser.wav";
+    public static final String SFX_MELEE_ATTACK = "audio/sfx/hit.wav";
+    public static final String SFX_ENEMY_HIT = "audio/sfx/hit.wav";
+    public static final String SFX_ENEMY_KILL = "audio/sfx/death.wav";
+    public static final String SFX_LOSE = "audio/sfx/lose.wav";
+    public static final String SFX_VICTORY = "audio/sfx/victory.wav";
+    public static final String SFX_ULTIMATE = "audio/sfx/ultimate.wav";
     public static final String SFX_SHIELD = "audio/sfx/shield_trigger.wav";
-    public static final String SFX_FROST_NOVA = "audio/sfx/frost_nova.wav";
-    public static final String SFX_FIREBALL = "audio/sfx/fireball_cast.wav";
-    public static final String SFX_GLACIAL_RIFT = "audio/sfx/glacial_rift.wav";
+    public static final String SFX_FIREBALL = "audio/sfx/laser.wav";
+    public static final String SFX_GLACIAL_RIFT = "audio/sfx/shield_trigger.wav";
     public static final String SFX_HEALTH_PICKUP = "audio/sfx/health_pickup.wav";
 
     private final AssetService assetService;
@@ -43,12 +46,16 @@ public class AudioService implements Disposable {
             return;
         }
 
-        stopMusic();
-        currentMusic = Gdx.audio.newMusic(Gdx.files.internal(path));
-        currentMusicPath = path;
-        currentMusic.setLooping(looping);
-        currentMusic.setVolume(musicVolume);
-        currentMusic.play();
+        try {
+            stopMusic();
+            currentMusic = Gdx.audio.newMusic(Gdx.files.internal(path));
+            currentMusicPath = path;
+            currentMusic.setLooping(looping);
+            currentMusic.setVolume(musicVolume);
+            currentMusic.play();
+        } catch (RuntimeException exception) {
+            Gdx.app.error("AudioService", "Could not play music: " + path, exception);
+        }
     }
 
     public void stopMusic() {
@@ -61,12 +68,16 @@ public class AudioService implements Disposable {
     }
 
     public void playSound(String path) {
-        Sound sound = soundCache.get(path);
-        if (sound == null) {
-            sound = Gdx.audio.newSound(Gdx.files.internal(path));
-            soundCache.put(path, sound);
+        try {
+            Sound sound = soundCache.get(path);
+            if (sound == null) {
+                sound = Gdx.audio.newSound(Gdx.files.internal(path));
+                soundCache.put(path, sound);
+            }
+            sound.play(sfxVolume);
+        } catch (RuntimeException exception) {
+            Gdx.app.error("AudioService", "Could not play sound: " + path, exception);
         }
-        sound.play(sfxVolume);
     }
 
     public void setMusicVolume(float volume) {

@@ -30,6 +30,7 @@ public class GameOverScreen extends ScreenAdapter {
     public void show() {
         Skin skin = context.getAssetService().getSkin();
         context.getAudioService().playMusic(AudioService.MUSIC_MENU, true);
+        context.getAudioService().playSound(AudioService.SFX_LOSE);
 
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);

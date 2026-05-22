@@ -13,8 +13,6 @@ import java.util.Map;
 
 public class LevelUpService {
 
-    private final UpgradePool upgradePool;
-    private final UnlockService unlockService;
     private final Map<UpgradeBranch, Integer> branchLevels;
 
     private int currentXp;
@@ -22,9 +20,7 @@ public class LevelUpService {
     private int pendingSkillPoints;
     private boolean pendingLevelUp;
 
-    public LevelUpService(UpgradePool upgradePool, UnlockService unlockService) {
-        this.upgradePool = upgradePool;
-        this.unlockService = unlockService;
+    public LevelUpService() {
         this.branchLevels = new EnumMap<>(UpgradeBranch.class);
         for (UpgradeBranch branch : UpgradeBranch.values()) {
             branchLevels.put(branch, 0);

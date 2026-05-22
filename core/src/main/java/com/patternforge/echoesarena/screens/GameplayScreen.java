@@ -34,8 +34,6 @@ import com.patternforge.echoesarena.player.PlayerClass;
 import com.patternforge.echoesarena.player.PlayerSelection;
 import com.patternforge.echoesarena.progression.LevelUpService;
 import com.patternforge.echoesarena.progression.UpgradeBranch;
-import com.patternforge.echoesarena.progression.UnlockService;
-import com.patternforge.echoesarena.progression.UpgradePool;
 import com.patternforge.echoesarena.stats.CombatStats;
 import com.patternforge.echoesarena.stats.ManaProfile;
 import com.patternforge.echoesarena.ui.UpgradeTreeView;
@@ -144,7 +142,7 @@ public class GameplayScreen extends ScreenAdapter {
     private static final float DASH_VISUAL_TIME = 0.20f;
     private static final float RANGED_ATTACK_COOLDOWN = 0.24f;
     private static final float RANGED_SHOT_SPEED = 560f;
-    private static final float RANGED_SHOT_DAMAGE = 20f;
+    private static final float RANGED_SHOT_DAMAGE = 120f;
     private static final float RANGED_SHOT_RADIUS = 7f;
     private static final float RANGED_SHOT_MAX_DISTANCE = 880f;
     private static final float RANGED_HOMING_RANGE = 620f;
@@ -226,7 +224,7 @@ public class GameplayScreen extends ScreenAdapter {
         spreadEnemiesAroundArena();
         resetStageSpecialState();
 
-        levelUpService = new LevelUpService(new UpgradePool(), new UnlockService());
+        levelUpService = new LevelUpService();
         Skin skin = context.getAssetService().getSkin();
         upgradeTreeView = new UpgradeTreeView(skin);
         context.getAudioService().playMusic(AudioService.MUSIC_ARENA, true);
@@ -396,7 +394,6 @@ public class GameplayScreen extends ScreenAdapter {
         handleRangedAttack();
         handleMeleeAttack();
         resolveProjectileCombat();
-        handleFrostNova();
         collectHealthPickups();
         removeDeadEnemies();
 
@@ -729,14 +726,14 @@ public class GameplayScreen extends ScreenAdapter {
     private void handleAbilityInput() {
         if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
             if (abilityService.castFireball(player)) {
-                context.getAudioService().playSound(AudioService.SFX_FIREBALL);
+                context.getAudioService().playSound(AudioService.SFX_ULTIMATE);
             }
             return;
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
             if (abilityService.castGlacialRift(player, enemies)) {
-                context.getAudioService().playSound(AudioService.SFX_GLACIAL_RIFT);
+                context.getAudioService().playSound(AudioService.SFX_ULTIMATE);
             }
         }
     }
@@ -1184,7 +1181,7 @@ public class GameplayScreen extends ScreenAdapter {
             }
         }
 
-        context.getAudioService().playSound(hitAnyEnemy ? AudioService.SFX_ENEMY_HIT : AudioService.SFX_PLAYER_ATTACK);
+        context.getAudioService().playSound(AudioService.SFX_MELEE_ATTACK);
     }
 
     private void resolveProjectileCombat() {
@@ -1206,7 +1203,7 @@ public class GameplayScreen extends ScreenAdapter {
                         continue;
                     }
 
-                    float hitRadius = projectile.getRadius() + Math.max(10f, enemy.getHitboxSize() * 0.75f);
+                    float hitRadius = projectile.getRadius() + getProjectileHitRadius(enemy);
                     if (enemy.getPosition().dst2(projectile.getPosition()) <= hitRadius * hitRadius) {
                         combatSystem.rangedHit(projectile, enemy);
                         projectile.expire();
@@ -1247,6 +1244,14 @@ public class GameplayScreen extends ScreenAdapter {
         return closest;
     }
 
+    private float getProjectileHitRadius(Enemy enemy) {
+        float hitRadius = Math.max(12f, enemy.getHitboxSize() * 1.35f);
+        if (isFinalBoss(enemy)) {
+            hitRadius = Math.max(hitRadius, enemy.getHitboxSize() * 3.2f);
+        }
+        return hitRadius;
+    }
+
     private Vector2 getPreferredRangedDirection() {
         Enemy closest = findClosestEnemy(player.getPosition(), RANGED_HOMING_RANGE);
         if (closest != null) {
@@ -1266,18 +1271,6 @@ public class GameplayScreen extends ScreenAdapter {
         }
 
         return new Vector2(player.getFacing());
-    }
-
-    private void handleFrostNova() {
-        boolean pressed = Gdx.input.isKeyJustPressed(Input.Keys.F);
-
-        if (!pressed) {
-            return;
-        }
-
-        if (abilityService.castFrostNova(player, enemies)) {
-            context.getAudioService().playSound(AudioService.SFX_FROST_NOVA);
-        }
     }
 
     private void collectHealthPickups() {
@@ -1359,14 +1352,33 @@ public class GameplayScreen extends ScreenAdapter {
     }
 
     private Texture loadTexture(String path) {
+        if (!Gdx.files.internal(path).exists()) {
+            return createFallbackTexture(Texture.TextureFilter.Nearest);
+        }
+
         Texture texture = new Texture(Gdx.files.internal(path));
         texture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         return texture;
     }
 
     private Texture loadLinearTexture(String path) {
+        if (!Gdx.files.internal(path).exists()) {
+            return createFallbackTexture(Texture.TextureFilter.Linear);
+        }
+
         Texture texture = new Texture(Gdx.files.internal(path));
         texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        return texture;
+    }
+
+    private Texture createFallbackTexture(Texture.TextureFilter filter) {
+        Pixmap pixmap = new Pixmap(16, 16, Pixmap.Format.RGBA8888);
+        pixmap.setColor(0f, 0f, 0f, 0f);
+        pixmap.fill();
+
+        Texture texture = new Texture(pixmap);
+        texture.setFilter(filter, filter);
+        pixmap.dispose();
         return texture;
     }
 
@@ -1881,7 +1893,7 @@ public class GameplayScreen extends ScreenAdapter {
         float barWidth = Math.min(286f, bottomPanelWidth * 0.37f);
         float slotSize = 58f;
         float slotGap = 12f;
-        float slotsX = bottomPanelX + bottomPanelWidth - (slotSize * 4f + slotGap * 3f) - 26f;
+        float slotsX = bottomPanelX + bottomPanelWidth - (slotSize * 3f + slotGap * 2f) - 26f;
         float slotsY = bottomPanelY + 36f;
 
         shapeRenderer.setProjectionMatrix(uiCamera.combined);
@@ -1895,9 +1907,8 @@ public class GameplayScreen extends ScreenAdapter {
         drawBar(barX, bottomPanelY + 28f, barWidth, 10f, levelUpService.getXpProgress(), new Color(0.25f, 0.95f, 0.45f, 1f));
 
         drawAbilitySlot(slotsX, slotsY, slotSize, player.getDashCooldownRatio(), Color.ORANGE);
-        drawAbilitySlot(slotsX + (slotSize + slotGap), slotsY, slotSize, getMagicCooldownRatio(), Color.PURPLE);
-        drawAbilitySlot(slotsX + (slotSize + slotGap) * 2f, slotsY, slotSize, player.getGuardianShieldCooldownRatio(), Color.CYAN);
-        drawAbilitySlot(slotsX + (slotSize + slotGap) * 3f, slotsY, slotSize, getUltimateRatio(), new Color(1f, 0.78f, 0.12f, 1f));
+        drawAbilitySlot(slotsX + (slotSize + slotGap), slotsY, slotSize, player.getGuardianShieldCooldownRatio(), Color.CYAN);
+        drawAbilitySlot(slotsX + (slotSize + slotGap) * 2f, slotsY, slotSize, getUltimateRatio(), new Color(1f, 0.78f, 0.12f, 1f));
 
         shapeRenderer.end();
 
@@ -1920,9 +1931,8 @@ public class GameplayScreen extends ScreenAdapter {
         drawHudText("LMB RANGED HOMING   RMB MELEE", barX, bottomPanelY + 22f);
 
         drawAbilityText("SPACE", "DASH", slotsX, slotsY, slotSize);
-        drawAbilityText("F", "FROST", slotsX + (slotSize + slotGap), slotsY, slotSize);
-        drawAbilityText("AUTO", "SHIELD", slotsX + (slotSize + slotGap) * 2f, slotsY, slotSize);
-        drawAbilityText("Q / E", abilityService.isUltimateReady() ? "READY" : Math.round(abilityService.getUltimateCharge()) + "%", slotsX + (slotSize + slotGap) * 3f, slotsY, slotSize);
+        drawAbilityText("AUTO", "SHIELD", slotsX + (slotSize + slotGap), slotsY, slotSize);
+        drawAbilityText("Q / E", abilityService.isUltimateReady() ? "READY" : Math.round(abilityService.getUltimateCharge()) + "%", slotsX + (slotSize + slotGap) * 2f, slotsY, slotSize);
 
         batch.end();
     }
@@ -2007,10 +2017,6 @@ public class GameplayScreen extends ScreenAdapter {
 
         shapeRenderer.setColor(playerCircuitColor.r, playerCircuitColor.g, playerCircuitColor.b, 0.82f);
         drawRectBorder(x, y, width, height, 2f);
-    }
-
-    private float getMagicCooldownRatio() {
-        return abilityService.getFrostNovaCooldownRatio();
     }
 
     private void drawBar(float x, float y, float width, float height, float ratio, Color fillColor) {

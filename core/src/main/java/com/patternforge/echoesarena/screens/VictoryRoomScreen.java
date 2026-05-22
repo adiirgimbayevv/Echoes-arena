@@ -65,6 +65,7 @@ public class VictoryRoomScreen extends ScreenAdapter {
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
         context.getAudioService().playMusic(AudioService.MUSIC_MENU, true);
+        context.getAudioService().playSound(AudioService.SFX_VICTORY);
 
         Table root = new Table();
         root.setFillParent(true);
