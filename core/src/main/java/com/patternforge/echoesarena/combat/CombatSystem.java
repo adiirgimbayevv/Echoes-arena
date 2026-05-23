@@ -1,6 +1,7 @@
 package com.patternforge.echoesarena.combat;
 
 import com.badlogic.gdx.math.Vector2;
+import com.patternforge.echoesarena.entity.Player;
 import com.patternforge.echoesarena.entity.Projectile;
 import com.patternforge.echoesarena.stats.CombatStats;
 import com.patternforge.echoesarena.stats.MagicalStats;
@@ -120,7 +121,11 @@ public class CombatSystem {
 
     private void applyHit(HitData hit, CombatTarget defender) {
         float damage = damageCalculator.calculate(hit, defender.getCombatStats());
-        defender.getCombatStats().applyDamage(damage);
+        if (defender instanceof Player) {
+            ((Player) defender).takeDamage(damage);
+        } else {
+            defender.getCombatStats().applyDamage(damage);
+        }
         if (hit.getAppliedEffect() != null && hit.getAppliedEffect() != StatusEffectType.NONE) {
             StatusEffect effect = StatusEffectFactory.create(hit.getAppliedEffect());
             defender.getStatusEffectSystem().apply(effect);

@@ -4,8 +4,8 @@ package com.patternforge.echoesarena.progression;
 import com.patternforge.echoesarena.config.BalanceConfig;
 import com.patternforge.echoesarena.player.PlayerBuild;
 import com.patternforge.echoesarena.stats.CombatStats;
-import com.patternforge.echoesarena.stats.MagicalStats;
 import com.patternforge.echoesarena.stats.ManaProfile;
+import com.patternforge.echoesarena.stats.MagicalStats;
 import com.patternforge.echoesarena.stats.PhysicalStats;
 
 import java.util.EnumMap;
@@ -63,38 +63,29 @@ public class LevelUpService {
         int branchLevel = getBranchLevel(branch);
 
         switch (branch) {
-            case SPEED:
-                if (branchLevel == 0) {
-                    return new UpgradeOption("tree_speed_1", "Quick Step", "+18 Speed", UpgradeCategory.PHYSICAL, UpgradeTarget.SPEED, 18f, false);
-                }
-                if (branchLevel % 2 == 1) {
-                    return new UpgradeOption("tree_speed_dash", "Shorter Dash Cooldown", "-0.18s Dash Cooldown", UpgradeCategory.PHYSICAL, UpgradeTarget.DASH_COOLDOWN, -0.18f, false);
-                }
-                return new UpgradeOption("tree_speed_distance", "Long Dash", "+14 Dash Distance", UpgradeCategory.PHYSICAL, UpgradeTarget.DASH_DISTANCE, 14f, false);
-            case POWER:
-                if (branchLevel == 0) {
-                    return new UpgradeOption("tree_power_1", "Sharper Blade", "+12% Damage", UpgradeCategory.PHYSICAL, UpgradeTarget.DAMAGE_MULTIPLIER, 0.12f, true);
-                }
-                if (branchLevel % 2 == 1) {
-                    return new UpgradeOption("tree_power_speed", "Faster Strikes", "+0.10 Attack Speed", UpgradeCategory.PHYSICAL, UpgradeTarget.ATTACK_SPEED, 0.10f, false);
-                }
-                return new UpgradeOption("tree_power_heavy", "Heavy Impact", "+10% Damage", UpgradeCategory.PHYSICAL, UpgradeTarget.DAMAGE_MULTIPLIER, 0.10f, true);
-            case MANA:
-                if (branchLevel == 0) {
-                    return new UpgradeOption("tree_mana_1", "Deep Mana", "+25 Max Mana", UpgradeCategory.MANA, UpgradeTarget.MAX_MANA, 25f, false);
-                }
-                if (branchLevel % 2 == 1) {
-                    return new UpgradeOption("tree_mana_regen", "Mana Flow", "+2.5 Mana/s", UpgradeCategory.MANA, UpgradeTarget.MANA_REGEN, 2.5f, false);
-                }
-                return new UpgradeOption("tree_mana_spell", "Spell Focus", "+12 Spell Power", UpgradeCategory.MAGICAL, UpgradeTarget.SPELL_POWER, 12f, false);
             case HEALTH:
                 if (branchLevel == 0) {
                     return new UpgradeOption("tree_hp_1", "Vital Core", "+25 Max HP", UpgradeCategory.PHYSICAL, UpgradeTarget.MAX_HP, 25f, false);
                 }
-                if (branchLevel % 2 == 1) {
-                    return new UpgradeOption("tree_hp_armor", "Armor Plating", "+3 Defense", UpgradeCategory.PHYSICAL, UpgradeTarget.DEFENSE, 3f, false);
-                }
                 return new UpgradeOption("tree_hp_large", "Fortified Body", "+20 Max HP", UpgradeCategory.PHYSICAL, UpgradeTarget.MAX_HP, 20f, false);
+            case SPEED:
+                if (branchLevel == 0) {
+                    return new UpgradeOption("tree_speed_1", "Quick Step", "+18 Speed", UpgradeCategory.PHYSICAL, UpgradeTarget.SPEED, 18f, false);
+                }
+                return new UpgradeOption("tree_speed_2", "Fleet Footing", "+10 Speed", UpgradeCategory.PHYSICAL, UpgradeTarget.SPEED, 10f, false);
+            case POWER:
+                if (branchLevel == 0) {
+                    return new UpgradeOption("tree_power_1", "Sharper Blade", "+12% Damage", UpgradeCategory.PHYSICAL, UpgradeTarget.DAMAGE_MULTIPLIER, 0.12f, true);
+                }
+                return new UpgradeOption("tree_power_heavy", "Heavy Impact", "+10% Damage", UpgradeCategory.PHYSICAL, UpgradeTarget.DAMAGE_MULTIPLIER, 0.10f, true);
+            case MANA:
+                if (branchLevel == 0) {
+                    return new UpgradeOption("tree_mana_1", "Deep Well", "+25 Max Mana", UpgradeCategory.MAGICAL, UpgradeTarget.MAX_MANA, 25f, false);
+                }
+                if (branchLevel % 2 == 1) {
+                    return new UpgradeOption("tree_mana_regen", "Flowing Focus", "+1.5 Mana Regen", UpgradeCategory.MAGICAL, UpgradeTarget.MANA_REGEN, 1.5f, false);
+                }
+                return new UpgradeOption("tree_mana_capacity", "Arcane Reserve", "+15 Max Mana", UpgradeCategory.MAGICAL, UpgradeTarget.MAX_MANA, 15f, false);
             default:
                 return null;
         }
@@ -162,25 +153,22 @@ public class LevelUpService {
                 magic.setSpellPower(magic.getSpellPower() + option.getValue());
                 break;
             case ELEMENTAL_BONUS:
-                float elemBonus = option.isPercentage()
-                        ? magic.getElementalBonus() + option.getValue()
-                        : magic.getElementalBonus() + option.getValue();
-                magic.setElementalBonus(elemBonus);
+                magic.setElementalBonus(magic.getElementalBonus() + option.getValue());
                 break;
             case ABILITY_CDR:
-                float newCdr = option.isPercentage()
-                        ? magic.getAbilityCooldownReduction() + option.getValue()
-                        : magic.getAbilityCooldownReduction() + option.getValue();
-                magic.setAbilityCooldownReduction(newCdr);
+                magic.setAbilityCooldownReduction(magic.getAbilityCooldownReduction() + option.getValue());
                 break;
             case MAX_MANA:
                 mana.setMaxMana(mana.getMaxMana() + option.getValue());
+                mana.add(option.getValue());
                 break;
             case MANA_REGEN:
                 mana.setManaRegenPerSecond(mana.getManaRegenPerSecond() + option.getValue());
                 break;
             case MANA_BURST_THRESHOLD:
-                mana.setBurstThreshold(Math.max(10f, mana.getBurstThreshold() + option.getValue()));
+                mana.setBurstThreshold(mana.getBurstThreshold() + option.getValue());
+                break;
+            default:
                 break;
         }
     }

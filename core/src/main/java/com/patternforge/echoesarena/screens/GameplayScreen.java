@@ -35,7 +35,6 @@ import com.patternforge.echoesarena.player.PlayerSelection;
 import com.patternforge.echoesarena.progression.LevelUpService;
 import com.patternforge.echoesarena.progression.UpgradeBranch;
 import com.patternforge.echoesarena.stats.CombatStats;
-import com.patternforge.echoesarena.stats.ManaProfile;
 import com.patternforge.echoesarena.ui.UpgradeTreeView;
 import com.patternforge.echoesarena.world.MapLoader;
 import com.patternforge.echoesarena.world.SpawnService;
@@ -116,6 +115,7 @@ public class GameplayScreen extends ScreenAdapter {
     private float rangedAttackCooldown;
     private float fireballCastVisualTimer;
     private float glacialRiftVisualTimer;
+    private float finalBossContactAttackTimer;
     private float stateTime;
     private float bossHealthDisplayRatio;
     private boolean wasPlayerDashing;
@@ -131,11 +131,13 @@ public class GameplayScreen extends ScreenAdapter {
     private boolean archersSpawnedForStage;
     private boolean finalBossSpawnedForStage;
     private boolean finalBossDefeatedForStage;
+    private boolean initialized;
     private Enemy activeBoss;
     private final Set<Enemy> stageTunedEnemies = new HashSet<Enemy>();
 
     private static final float MELEE_ATTACK_RANGE = 72f;
-    private static final float MELEE_ATTACK_DAMAGE = 28f;
+    private static final float MELEE_ATTACK_DAMAGE = 150f;
+    private static final float MELEE_ATTACK_MANA_COST = 12f;
     private static final float MELEE_ATTACK_COOLDOWN = 0.40f;
     private static final float MELEE_ATTACK_ANIMATION_TIME = 0.16f;
     private static final float DASH_VISUAL_TIME = 0.20f;
@@ -154,6 +156,8 @@ public class GameplayScreen extends ScreenAdapter {
 
     private static final float BOSS_ANNOUNCEMENT_TIME = 3.5f;
     private static final float BOSS_FLASH_TIME = 1.1f;
+    private static final float FINAL_BOSS_CONTACT_ATTACK_COOLDOWN = 1.35f;
+    private static final float FINAL_BOSS_CONTACT_ATTACK_RANGE = 96f;
 
     private static final float HEALTH_PICKUP_RADIUS = 14f;
     private static final float HEALTH_PICKUP_HEAL = 25f;
@@ -173,6 +177,12 @@ public class GameplayScreen extends ScreenAdapter {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(null);
+
+        if (initialized) {
+            return;
+        }
+
+        initialized = true;
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, GameConfig.VIEWPORT_WIDTH, GameConfig.VIEWPORT_HEIGHT);
@@ -204,7 +214,6 @@ public class GameplayScreen extends ScreenAdapter {
 
         healthPickups = new ArrayList<HealthPickup>();
         arenaObstacles = new ArrayList<ArenaObstacle>();
-//        playerRangedShots = new ArrayList<PlayerRangedShot>();
 
         MapLoader mapLoader = new MapLoader();
         StageRepository stageRepository = new StageRepository(mapLoader);
@@ -244,6 +253,7 @@ public class GameplayScreen extends ScreenAdapter {
         rangedAttackCooldown = 0f;
         fireballCastVisualTimer = 0f;
         glacialRiftVisualTimer = 0f;
+        finalBossContactAttackTimer = 0f;
         stateTime = 0f;
 
         killedEnemies = 0;
@@ -392,6 +402,7 @@ public class GameplayScreen extends ScreenAdapter {
         pullIdleEnemiesTowardPlayer(delta);
         resolveEnemyObstacleCollisions();
         keepEnemiesInsideArena();
+        applyFinalBossContactDamage();
 
         handleRangedAttack();
         handleMeleeAttack();
@@ -412,6 +423,7 @@ public class GameplayScreen extends ScreenAdapter {
         rangedAttackCooldown = Math.max(0f, rangedAttackCooldown - delta);
         fireballCastVisualTimer = Math.max(0f, fireballCastVisualTimer - delta);
         glacialRiftVisualTimer = Math.max(0f, glacialRiftVisualTimer - delta);
+        finalBossContactAttackTimer = Math.max(0f, finalBossContactAttackTimer - delta);
 
         Enemy boss = getActiveBoss();
         if (boss != null) {
@@ -516,6 +528,7 @@ public class GameplayScreen extends ScreenAdapter {
         guardianShieldVisualTimer = 0f;
         bossAnnouncementTimer = 0f;
         bossSpawnFlashTimer = 0f;
+        finalBossContactAttackTimer = 0f;
         activeBoss = null;
         bossHealthDisplayRatio = 1f;
     }
@@ -619,6 +632,8 @@ public class GameplayScreen extends ScreenAdapter {
         stats.setCurrentHp(340f * bossScale);
         stats.setDefense(10f + currentStageId * 1.4f);
         stats.setDamageMultiplier(1.35f + currentStageId * 0.10f);
+        boss.setSpeedMultiplier(1.25f);
+        boss.setMaxHpDamageRatio(0.5f);
 
         enemies.add(boss);
         activeBoss = boss;
@@ -628,6 +643,7 @@ public class GameplayScreen extends ScreenAdapter {
         finalBossDefeatedForStage = false;
         bossAnnouncementTimer = BOSS_ANNOUNCEMENT_TIME;
         bossSpawnFlashTimer = BOSS_FLASH_TIME;
+        finalBossContactAttackTimer = 0f;
         context.getAudioService().playSound(AudioService.SFX_GLACIAL_RIFT);
     }
 
@@ -689,6 +705,21 @@ public class GameplayScreen extends ScreenAdapter {
         return enemy.getType() == EnemyType.TANK
             && currentStageId >= 5
             && enemy.getCombatStats().getMaxHp() >= 300f;
+    }
+
+    private void applyFinalBossContactDamage() {
+        Enemy boss = getActiveBoss();
+        if (boss == null || finalBossContactAttackTimer > 0f || player.isDead()) {
+            return;
+        }
+
+        if (boss.getPosition().dst(player.getPosition()) > FINAL_BOSS_CONTACT_ATTACK_RANGE) {
+            return;
+        }
+
+        player.takeDamage(player.getCombatStats().getMaxHp() * 0.5f);
+        finalBossContactAttackTimer = FINAL_BOSS_CONTACT_ATTACK_COOLDOWN;
+        context.getAudioService().playSound(AudioService.SFX_ENEMY_HIT);
     }
 
     private Vector2 randomSpawnPositionAwayFromPlayer(float minDistanceFromPlayer) {
@@ -1138,8 +1169,8 @@ public class GameplayScreen extends ScreenAdapter {
 
         HitData hitData = new HitData(
             com.patternforge.echoesarena.combat.HitType.RANGED,
-            0f,
             RANGED_SHOT_DAMAGE,
+            0f,
             player.getCombatStats(),
             player.getBuild().getMagicalStats(),
             com.patternforge.echoesarena.combat.StatusEffectType.NONE
@@ -1169,6 +1200,10 @@ public class GameplayScreen extends ScreenAdapter {
             return;
         }
 
+        if (!player.spendMana(MELEE_ATTACK_MANA_COST)) {
+            return;
+        }
+
         meleeAttackCooldown = MELEE_ATTACK_COOLDOWN / Math.max(0.65f, player.getBuild().getPhysicalStats().getAttackSpeed());
         boolean hitAnyEnemy = false;
 
@@ -1177,7 +1212,12 @@ public class GameplayScreen extends ScreenAdapter {
 
         for (Enemy enemy : enemies) {
             if (enemy.isAlive() && enemy.getPosition().dst(attackCenter) <= MELEE_ATTACK_RANGE) {
-                enemy.takeDamage(MELEE_ATTACK_DAMAGE);
+                combatSystem.meleeHit(
+                    player,
+                    enemy,
+                    MELEE_ATTACK_DAMAGE,
+                    com.patternforge.echoesarena.combat.StatusEffectType.NONE
+                );
                 hitAnyEnemy = true;
             }
         }
@@ -1972,8 +2012,8 @@ public class GameplayScreen extends ScreenAdapter {
         drawHudPanel(bottomPanelX, bottomPanelY, bottomPanelWidth, bottomPanelHeight);
 
         drawBar(barX, bottomPanelY + 82f, barWidth, 20f, player.getCombatStats().getHpRatio(), new Color(0.95f, 0.12f, 0.10f, 1f));
-        drawBar(barX, bottomPanelY + 52f, barWidth, 16f, player.getManaProfile().getManaRatio(), new Color(0.16f, 0.45f, 1f, 1f));
-        drawBar(barX, bottomPanelY + 28f, barWidth, 10f, levelUpService.getXpProgress(), new Color(0.25f, 0.95f, 0.45f, 1f));
+        drawBar(barX, bottomPanelY + 54f, barWidth, 14f, player.getManaProfile().getManaRatio(), new Color(0.10f, 0.42f, 1f, 1f));
+        drawBar(barX, bottomPanelY + 30f, barWidth, 10f, levelUpService.getXpProgress(), new Color(0.25f, 0.95f, 0.45f, 1f));
 
         drawAbilitySlot(slotsX, slotsY, slotSize, player.getDashCooldownRatio(), Color.ORANGE);
         drawAbilitySlot(slotsX + (slotSize + slotGap), slotsY, slotSize, player.getGuardianShieldCooldownRatio(), Color.CYAN);
@@ -1985,19 +2025,16 @@ public class GameplayScreen extends ScreenAdapter {
         batch.begin();
 
         CombatStats combatStats = player.getCombatStats();
-        ManaProfile manaProfile = player.getManaProfile();
-
-        int currentWave = stageDirector.getCurrentWaveIndex() + 1;
         int totalWaves = stageDirector.getTotalWaves();
+        int currentWave = Math.min(totalWaves, stageDirector.getCurrentWaveIndex() + 1);
 
         drawCenteredText("STAGE " + currentStageId + " / " + totalStages, topPanelX + topPanelWidth * 0.18f, topPanelY + 42f);
         drawCenteredText("WAVE " + currentWave + " / " + totalWaves, topPanelX + topPanelWidth * 0.50f, topPanelY + 42f);
         drawCenteredText("KILLS " + killedEnemies + "   MEDKITS " + collectedHealthPickups, topPanelX + topPanelWidth * 0.80f, topPanelY + 42f);
 
         drawHudText("HP  " + format(combatStats.getCurrentHp()) + " / " + format(combatStats.getMaxHp()), barX, bottomPanelY + 104f);
-        drawHudText("MANA  " + format(manaProfile.getCurrentMana()) + " / " + format(manaProfile.getMaxMana()), barX, bottomPanelY + 73f);
-        drawHudText("LVL " + levelUpService.getCurrentLevel() + "   XP " + levelUpService.getCurrentXp() + "/" + levelUpService.getXpForNextLevel(), barX, bottomPanelY + 46f);
-        drawHudText("LMB RANGED HOMING   RMB MELEE", barX, bottomPanelY + 22f);
+        drawHudText("MANA  " + format(player.getManaProfile().getCurrentMana()) + " / " + format(player.getManaProfile().getMaxMana()), barX, bottomPanelY + 74f);
+        drawHudText("LVL " + levelUpService.getCurrentLevel() + "   XP " + levelUpService.getCurrentXp() + "/" + levelUpService.getXpForNextLevel(), barX, bottomPanelY + 50f);
 
         drawAbilityText("SPACE", "DASH", slotsX, slotsY, slotSize);
         drawAbilityText("AUTO", "SHIELD", slotsX + (slotSize + slotGap), slotsY, slotSize);
@@ -2031,20 +2068,6 @@ public class GameplayScreen extends ScreenAdapter {
         drawRectBorder(x, y, barWidth, barHeight, 2.5f);
         shapeRenderer.end();
 
-        batch.setProjectionMatrix(uiCamera.combined);
-        batch.begin();
-        drawCenteredText(getBossName(boss), uiCamera.viewportWidth / 2f, y + barHeight + 28f);
-        batch.end();
-    }
-
-    private String getBossName(Enemy boss) {
-        if (boss.getType() == EnemyType.TANK) {
-            return "ORC WARLORD";
-        }
-        if (boss.getType() == EnemyType.SNIPER) {
-            return "CRYPT MARKSMAN";
-        }
-        return "ARENA BOSS";
     }
 
     private void drawBossAnnouncement() {

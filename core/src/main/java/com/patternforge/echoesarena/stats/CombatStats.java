@@ -14,9 +14,8 @@ public class CombatStats {
         this.damageMultiplier = damageMultiplier;
     }
 
-    public void applyDamage(float rawDamage) {
-        float reduced = Math.max(0, rawDamage - defense);
-        currentHp = Math.max(0, currentHp - reduced);
+    public void applyDamage(float damage) {
+        currentHp = Math.max(0, currentHp - Math.max(0f, damage));
     }
 
     public void heal(float amount) {

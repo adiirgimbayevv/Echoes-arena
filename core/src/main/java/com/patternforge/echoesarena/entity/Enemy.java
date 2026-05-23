@@ -35,6 +35,8 @@ public class Enemy implements CombatSystem.CombatTarget, CombatSystem.MagicalSta
     private final float hitboxSize;
 
     private CombatSystem combatSystem;
+    private float speedMultiplier;
+    private float maxHpDamageRatio;
 
     public Enemy(EnemyType type, float x, float y, float hitboxSize,
                  CombatStats combatStats, MagicalStats magicalStats,
@@ -53,6 +55,8 @@ public class Enemy implements CombatSystem.CombatTarget, CombatSystem.MagicalSta
         this.detectionRange = type.getDetectionRange();
         this.baseDamage = type.getBaseDamage();
         this.baseSpeed = type.getBaseSpeed();
+        this.speedMultiplier = 1f;
+        this.maxHpDamageRatio = 0f;
     }
 
     public void update(float delta, Player target, List<Enemy> nearbyEnemies) {
@@ -91,6 +95,11 @@ public class Enemy implements CombatSystem.CombatTarget, CombatSystem.MagicalSta
     }
 
     public void performAttack(Player target) {
+        if (maxHpDamageRatio > 0f) {
+            target.takeDamage(target.getCombatStats().getMaxHp() * maxHpDamageRatio);
+            return;
+        }
+
         HitData hit = new HitData(
                 HitType.MELEE,
                 baseDamage,
@@ -132,7 +141,15 @@ public class Enemy implements CombatSystem.CombatTarget, CombatSystem.MagicalSta
     }
 
     public float getEffectiveSpeed() {
-        return baseSpeed * statusEffectSystem.getSpeedMultiplier();
+        return baseSpeed * speedMultiplier * statusEffectSystem.getSpeedMultiplier();
+    }
+
+    public void setSpeedMultiplier(float speedMultiplier) {
+        this.speedMultiplier = Math.max(0.1f, speedMultiplier);
+    }
+
+    public void setMaxHpDamageRatio(float maxHpDamageRatio) {
+        this.maxHpDamageRatio = Math.max(0f, maxHpDamageRatio);
     }
 
     @Override

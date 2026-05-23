@@ -19,10 +19,8 @@ public class HudView implements Disposable {
     private final Skin skin;
 
     private ProgressBar hpBar;
-    private ProgressBar manaBar;
     private ProgressBar xpBar;
     private Label hpLabel;
-    private Label manaLabel;
     private Label levelLabel;
     private Label stageLabel;
     private Label waveLabel;
@@ -39,13 +37,10 @@ public class HudView implements Disposable {
         root.top().left().pad(8);
 
         hpBar = new ProgressBar(0f, 1f, 0.01f, false, skin);
-        manaBar = new ProgressBar(0f, 1f, 0.01f, false, skin);
         xpBar = new ProgressBar(0f, 1f, 0.01f, false, skin);
 
         hpLabel = new Label("HP", skin);
         hpLabel.setColor(Color.RED);
-        manaLabel = new Label("MP", skin);
-        manaLabel.setColor(Color.CYAN);
         levelLabel = new Label("Lv 1", skin);
         stageLabel = new Label("Stage -", skin);
         waveLabel = new Label("Wave -", skin);
@@ -53,8 +48,6 @@ public class HudView implements Disposable {
         Table statsLeft = new Table();
         statsLeft.add(hpLabel).left().row();
         statsLeft.add(hpBar).width(120).height(8).row();
-        statsLeft.add(manaLabel).left().row();
-        statsLeft.add(manaBar).width(120).height(8).row();
         statsLeft.add(xpBar).width(120).height(5).row();
         statsLeft.add(levelLabel).left();
 
@@ -70,20 +63,14 @@ public class HudView implements Disposable {
 
     public void update(Player player, LevelUpService levelUpService, int stageId, int waveIndex, int totalWaves) {
         float hpRatio = player.getCombatStats().getHpRatio();
-        float manaRatio = player.getManaProfile().getManaRatio();
         float xpRatio = levelUpService.getXpProgress();
 
         hpBar.setValue(hpRatio);
-        manaBar.setValue(manaRatio);
         xpBar.setValue(xpRatio);
 
         hpLabel.setText(String.format("HP  %.0f / %.0f",
                 player.getCombatStats().getCurrentHp(),
                 player.getCombatStats().getMaxHp()));
-
-        manaLabel.setText(String.format("MP  %.0f / %.0f",
-                player.getManaProfile().getCurrentMana(),
-                player.getManaProfile().getMaxMana()));
 
         levelLabel.setText("Lv " + levelUpService.getCurrentLevel());
         stageLabel.setText("Stage " + stageId);

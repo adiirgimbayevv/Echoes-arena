@@ -45,8 +45,10 @@ public class UpgradeTreeView implements Disposable {
         Label points = new Label("Skill Points: " + levelUpService.getPendingSkillPoints(), skin);
         points.setColor(Color.CYAN);
 
-        root.add(title).colspan(4).padBottom(8f).row();
-        root.add(points).colspan(4).padBottom(18f).row();
+        int branchCount = UpgradeBranch.values().length;
+
+        root.add(title).colspan(branchCount).padBottom(8f).row();
+        root.add(points).colspan(branchCount).padBottom(18f).row();
 
         for (UpgradeBranch branch : UpgradeBranch.values()) {
             root.add(buildBranchCard(branch, levelUpService)).width(210f).height(220f).pad(8f).top();
@@ -63,7 +65,7 @@ public class UpgradeTreeView implements Disposable {
             }
         });
 
-        root.add(closeButton).colspan(4).width(260f).height(52f).padTop(18f);
+        root.add(closeButton).colspan(branchCount).width(260f).height(52f).padTop(18f);
         stage.addActor(root);
     }
 

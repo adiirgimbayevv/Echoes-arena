@@ -43,6 +43,10 @@ public class ScreenRouter {
     }
 
     public void returnTo(Screen previousScreen) {
+        Screen currentScreen = game.getScreen();
         game.setScreen(previousScreen);
+        if (currentScreen != null && currentScreen != previousScreen) {
+            currentScreen.dispose();
+        }
     }
 }

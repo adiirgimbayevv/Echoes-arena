@@ -1,10 +1,10 @@
 package com.patternforge.echoesarena.progression;
 
 public enum UpgradeBranch {
-    SPEED("Speed", "Move faster and dash better"),
+    HEALTH("HP", "Survive longer with more health"),
+    SPEED("Speed", "Move faster"),
     POWER("Power", "Deal stronger weapon damage"),
-    MANA("Mana", "Cast more often and recover mana"),
-    HEALTH("HP", "Survive longer with health and armor");
+    MANA("Mana", "Cast and strike longer with more mana");
 
     private final String displayName;
     private final String description;

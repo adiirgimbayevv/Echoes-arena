@@ -111,8 +111,10 @@ public class PauseScreen extends ScreenAdapter {
         Label controlsLabel = new Label(
             "Move: WASD / Arrow Keys\n"
                 + "Dash: Space\n"
-                + "Attack: Left Mouse Button\n"
-                + "Magic Blast: F / Right Mouse Button\n"
+                + "Ranged Homing: Left Mouse Button\n"
+                + "Melee Strike: Right Mouse Button\n"
+                + "Ultimate Fireball: Q\n"
+                + "Ultimate Frost Rift: E\n"
                 + "Pause: Esc\n\n"
                 + "Goal: survive all waves and clear 10 levels.",
             skin
