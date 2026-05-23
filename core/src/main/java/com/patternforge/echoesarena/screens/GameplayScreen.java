@@ -76,10 +76,7 @@ public class GameplayScreen extends ScreenAdapter {
     private Texture tankTexture;
     private Texture sniperTexture;
     private Texture supportTexture;
-    private Texture fireballTexture;
     private Texture frostNovaTexture;
-    private Texture slashArcTexture;
-    private Texture magicBlastTexture;
     private Texture attackAirSheetTexture;
     private Texture dashSheetTexture;
     private Texture fireballSheetTexture;
@@ -117,6 +114,8 @@ public class GameplayScreen extends ScreenAdapter {
     private float bossSpawnFlashTimer;
     private float dashVisualTimer;
     private float rangedAttackCooldown;
+    private float fireballCastVisualTimer;
+    private float glacialRiftVisualTimer;
     private float stateTime;
     private float bossHealthDisplayRatio;
     private boolean wasPlayerDashing;
@@ -140,6 +139,7 @@ public class GameplayScreen extends ScreenAdapter {
     private static final float MELEE_ATTACK_COOLDOWN = 0.40f;
     private static final float MELEE_ATTACK_ANIMATION_TIME = 0.16f;
     private static final float DASH_VISUAL_TIME = 0.20f;
+    private static final float ULTIMATE_CAST_VISUAL_TIME = 0.36f;
     private static final float RANGED_ATTACK_COOLDOWN = 0.24f;
     private static final float RANGED_SHOT_SPEED = 560f;
     private static final float RANGED_SHOT_DAMAGE = 120f;
@@ -242,6 +242,8 @@ public class GameplayScreen extends ScreenAdapter {
         bossAnnouncementTimer = 0f;
         dashVisualTimer = 0f;
         rangedAttackCooldown = 0f;
+        fireballCastVisualTimer = 0f;
+        glacialRiftVisualTimer = 0f;
         stateTime = 0f;
 
         killedEnemies = 0;
@@ -408,6 +410,8 @@ public class GameplayScreen extends ScreenAdapter {
         bossSpawnFlashTimer = Math.max(0f, bossSpawnFlashTimer - delta);
         dashVisualTimer = Math.max(0f, dashVisualTimer - delta);
         rangedAttackCooldown = Math.max(0f, rangedAttackCooldown - delta);
+        fireballCastVisualTimer = Math.max(0f, fireballCastVisualTimer - delta);
+        glacialRiftVisualTimer = Math.max(0f, glacialRiftVisualTimer - delta);
 
         Enemy boss = getActiveBoss();
         if (boss != null) {
@@ -435,12 +439,7 @@ public class GameplayScreen extends ScreenAdapter {
 
         drawArena();
         drawHealthPickups();
-        drawMagicBlast();
-        drawFreezeVisual();
         drawGuardianShield();
-        drawPlayerAttack();
-        drawFireballs();
-        drawProjectiles();
 
         shapeRenderer.end();
 
@@ -726,6 +725,7 @@ public class GameplayScreen extends ScreenAdapter {
     private void handleAbilityInput() {
         if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
             if (abilityService.castFireball(player)) {
+                fireballCastVisualTimer = ULTIMATE_CAST_VISUAL_TIME;
                 context.getAudioService().playSound(AudioService.SFX_ULTIMATE);
             }
             return;
@@ -733,6 +733,7 @@ public class GameplayScreen extends ScreenAdapter {
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
             if (abilityService.castGlacialRift(player, enemies)) {
+                glacialRiftVisualTimer = ULTIMATE_CAST_VISUAL_TIME;
                 context.getAudioService().playSound(AudioService.SFX_ULTIMATE);
             }
         }
@@ -1320,15 +1321,12 @@ public class GameplayScreen extends ScreenAdapter {
         tankTexture = loadTexture("external/anokolisa/Entities/Mobs/Orc Crew/Orc - Warrior/Run/Run-Sheet.png");
         sniperTexture = loadTexture("external/anokolisa/Entities/Mobs/Skeleton Crew/Skeleton - Mage/Run/Run-Sheet.png");
         supportTexture = loadTexture("external/anokolisa/Entities/Mobs/Orc Crew/Orc - Shaman/Run/Run-Sheet.png");
-        fireballTexture = loadTexture("art/effects/fireball.png");
-        frostNovaTexture = loadTexture("art/effects/frost_nova.png");
-        slashArcTexture = loadTexture("art/effects/slash_arc.png");
-        magicBlastTexture = loadTexture("art/effects/magic_blast.png");
-        attackAirSheetTexture = loadTexture("art/effects/sheets/attack_air_sheet.png");
-        dashSheetTexture = loadTexture("art/effects/sheets/dash_sheet.png");
-        fireballSheetTexture = loadTexture("art/effects/sheets/fireball_sheet.png");
-        magicSheetTexture = loadTexture("art/effects/sheets/magic_sheet.png");
-        sparksSheetTexture = loadTexture("art/effects/sheets/sparks_sheet.png");
+        frostNovaTexture = loadTexture("art/effects/sheets/GameFXexport/SPRITESHEET_Files/IceCast_96x96.png");
+        attackAirSheetTexture = loadTexture("art/effects/sheets/GameFXexport/SPRITESHEET_Files/PoisonClaw_96x96.png");
+        dashSheetTexture = loadTexture("art/effects/sheets/GameFXexport/SPRITESHEET_Files/TornadoMoving_96x96.png");
+        fireballSheetTexture = loadTexture("art/effects/sheets/GameFXexport/SPRITESHEET_Files/FireBall_64x64.png");
+        magicSheetTexture = loadTexture("art/effects/sheets/GameFXexport/SPRITESHEET_Files/FireCast_96x96.png");
+        sparksSheetTexture = loadTexture("art/effects/sheets/GameFXexport/SPRITESHEET_Files/LightCast_96.png");
         worldBackdropTexture = loadLinearTexture(resolveWorldBackdropPath());
         floorTilesTexture = loadTexture("external/anokolisa/Environment/Tilesets/Floors_Tiles.png");
         dungeonTilesTexture = loadTexture("external/anokolisa/Environment/Tilesets/Dungeon_Tiles.png");
@@ -1595,9 +1593,45 @@ public class GameplayScreen extends ScreenAdapter {
     }
 
     private void drawMagicBlast() {
+        if (fireballCastVisualTimer <= 0f) {
+            return;
+        }
+
+        float ratio = fireballCastVisualTimer / ULTIMATE_CAST_VISUAL_TIME;
+        float pulse = 0.5f + 0.5f * MathUtils.sin(stateTime * 28f);
+        float radius = 28f + (1f - ratio) * 48f;
+
+        shapeRenderer.setColor(0.16f, 0.72f, 1f, 0.18f + 0.24f * ratio);
+        shapeRenderer.circle(player.getPosition().x, player.getPosition().y, radius);
+        shapeRenderer.setColor(0.70f, 0.94f, 1f, 0.55f * ratio);
+        shapeRenderer.circle(player.getPosition().x, player.getPosition().y, 12f + pulse * 8f);
     }
 
     private void drawFreezeVisual() {
+        if (abilityService.getFreezeVisualTimer() <= 0f && glacialRiftVisualTimer <= 0f) {
+            return;
+        }
+
+        float freezeRatio = abilityService.getFreezeVisualTime() <= 0f
+            ? 0f
+            : abilityService.getFreezeVisualTimer() / abilityService.getFreezeVisualTime();
+        float castRatio = ULTIMATE_CAST_VISUAL_TIME <= 0f ? 0f : glacialRiftVisualTimer / ULTIMATE_CAST_VISUAL_TIME;
+        float ratio = Math.max(freezeRatio, castRatio);
+        float radius = 52f + (1f - ratio) * abilityService.getFreezeVisualRadius();
+
+        shapeRenderer.setColor(0.52f, 0.90f, 1f, 0.16f + 0.22f * ratio);
+        shapeRenderer.circle(player.getPosition().x, player.getPosition().y, radius);
+        shapeRenderer.setColor(0.82f, 0.98f, 1f, 0.42f * ratio);
+        for (int i = 0; i < 12; i++) {
+            float angle = i * 30f + stateTime * 80f;
+            float inner = radius * 0.35f;
+            float outer = radius * (0.78f + 0.10f * MathUtils.sin(stateTime * 5f + i));
+            float x1 = player.getPosition().x + MathUtils.cosDeg(angle) * inner;
+            float y1 = player.getPosition().y + MathUtils.sinDeg(angle) * inner;
+            float x2 = player.getPosition().x + MathUtils.cosDeg(angle) * outer;
+            float y2 = player.getPosition().y + MathUtils.sinDeg(angle) * outer;
+            shapeRenderer.rectLine(x1, y1, x2, y2, 3f);
+        }
     }
 
     private void drawGuardianShield() {
@@ -1620,6 +1654,14 @@ public class GameplayScreen extends ScreenAdapter {
     }
 
     private void drawFireballs() {
+        for (AbilityService.AbilityProjectile fireball : abilityService.getFireballs()) {
+            float pulse = 0.5f + 0.5f * MathUtils.sin(stateTime * 18f);
+            float radius = abilityService.getFireballRadius();
+            shapeRenderer.setColor(0.12f, 0.55f, 1f, 0.42f);
+            shapeRenderer.circle(fireball.getPosition().x, fireball.getPosition().y, radius * (2.4f + pulse));
+            shapeRenderer.setColor(0.78f, 0.96f, 1f, 0.92f);
+            shapeRenderer.circle(fireball.getPosition().x, fireball.getPosition().y, radius * (1.05f + pulse * 0.25f));
+        }
     }
 
     private void drawPlayer() {
@@ -1742,9 +1784,13 @@ public class GameplayScreen extends ScreenAdapter {
                 continue;
             }
 
-            Vector2 tail = new Vector2(projectile.getPosition()).mulAdd(new Vector2(velocity).nor(), -projectile.getRadius() * 3.8f);
+            Vector2 tail = new Vector2(projectile.getPosition()).mulAdd(new Vector2(velocity).nor(), -projectile.getRadius() * 7.5f);
             if (projectile.isFromPlayer()) {
-                shapeRenderer.setColor(0.30f, 0.75f, 1f, 0.78f);
+                shapeRenderer.setColor(0.08f, 0.52f, 1f, 0.28f);
+                shapeRenderer.rectLine(projectile.getPosition().x, projectile.getPosition().y, tail.x, tail.y, projectile.getRadius() * 2.2f);
+                shapeRenderer.setColor(0.48f, 0.88f, 1f, 0.92f);
+                shapeRenderer.rectLine(projectile.getPosition().x, projectile.getPosition().y, tail.x, tail.y, projectile.getRadius() * 0.75f);
+                shapeRenderer.setColor(0.88f, 0.98f, 1f, 0.98f);
             } else {
                 shapeRenderer.setColor(1f, 0.42f, 0.30f, 0.75f);
             }
@@ -1763,13 +1809,17 @@ public class GameplayScreen extends ScreenAdapter {
     }
 
     private void drawMagicBlastSprite() {
-        if (abilityService.getMagicVisualTimer() <= 0f) {
+        float timer = Math.max(abilityService.getMagicVisualTimer(), fireballCastVisualTimer);
+        if (timer <= 0f) {
             return;
         }
 
-        float progress = abilityService.getMagicVisualTimer() / abilityService.getMagicVisualTime();
+        float duration = fireballCastVisualTimer > abilityService.getMagicVisualTimer()
+            ? ULTIMATE_CAST_VISUAL_TIME
+            : abilityService.getMagicVisualTime();
+        float progress = timer / Math.max(0.001f, duration);
         float size = abilityService.getMagicVisualRadius() * (2f - progress * 0.25f);
-        drawEffectSheet(magicSheetTexture, player.getPosition().x, player.getPosition().y, size, 100, 100, 0.62f, progress);
+        drawEffectSheet(magicSheetTexture, player.getPosition().x, player.getPosition().y, size, 96, 96, 0.78f, 1f - progress);
     }
 
     private void drawFreezeSprite() {
@@ -1779,7 +1829,7 @@ public class GameplayScreen extends ScreenAdapter {
 
         float ratio = abilityService.getFreezeVisualTimer() / abilityService.getFreezeVisualTime();
         float size = abilityService.getFreezeVisualRadius() * (1.9f - ratio * 0.15f);
-        drawCenteredTexture(frostNovaTexture, player.getPosition().x, player.getPosition().y, size, 0.66f);
+        drawEffectSheet(frostNovaTexture, player.getPosition().x, player.getPosition().y, size, 96, 96, 0.82f, 1f - ratio);
     }
 
     private void drawDashSprite() {
@@ -1789,7 +1839,7 @@ public class GameplayScreen extends ScreenAdapter {
 
         float progress = 1f - dashVisualTimer / DASH_VISUAL_TIME;
         Vector2 dashCenter = new Vector2(player.getPosition()).sub(new Vector2(player.getFacing()).scl(34f));
-        drawEffectSheet(dashSheetTexture, dashCenter.x, dashCenter.y, 96f, 100, 100, 0.70f, progress);
+        drawEffectSheet(dashSheetTexture, dashCenter.x, dashCenter.y, 96f, 96, 96, 0.70f, progress);
     }
 
     private void drawSlashSprite() {
@@ -1804,22 +1854,29 @@ public class GameplayScreen extends ScreenAdapter {
         float clampedProgress = Math.min(1f, progress);
         float size = 82f + 48f * clampedProgress;
         float alpha = 0.72f * (1f - clampedProgress * 0.45f);
-        drawEffectSheet(attackAirSheetTexture, attackCenter.x, attackCenter.y, size, 100, 100, alpha, clampedProgress);
+        Vector2 facing = new Vector2(player.getFacing());
+        if (facing.len2() <= 0.001f) {
+            facing.set(1f, 0f);
+        }
+        facing.nor();
+        float rotation = facing.angleDeg() - 10f;
+        drawEffectSheetRotated(attackAirSheetTexture, attackCenter.x, attackCenter.y, size, 96, 96, alpha, clampedProgress, rotation);
     }
 
     private void drawFireballSprites() {
         for (AbilityService.AbilityProjectile fireball : abilityService.getFireballs()) {
             float size = abilityService.getFireballRadius() * 5.5f;
             float progress = (stateTime * 12f) % 1f;
-            drawEffectSheet(fireballSheetTexture, fireball.getPosition().x, fireball.getPosition().y, size, 100, 100, 1f, progress);
+            drawEffectSheet(fireballSheetTexture, fireball.getPosition().x, fireball.getPosition().y, size, 64, 64, 1f, progress);
         }
     }
 
     private void drawProjectileSprites() {
         for (Projectile projectile : combatSystem.getProjectiles()) {
-            float size = projectile.getRadius() * 5f;
-            float progress = (stateTime * 12f) % 1f;
-            drawEffectSheet(sparksSheetTexture, projectile.getPosition().x, projectile.getPosition().y, size, 100, 100, 0.78f, progress);
+            float size = projectile.isFromPlayer() ? projectile.getRadius() * 8.5f : projectile.getRadius() * 5f;
+            float progress = (stateTime * 18f) % 1f;
+            float rotation = projectile.getVelocity().angleDeg();
+            drawEffectSheetRotated(sparksSheetTexture, projectile.getPosition().x, projectile.getPosition().y, size, 96, 96, 0.86f, progress, rotation);
         }
     }
 
@@ -1830,6 +1887,18 @@ public class GameplayScreen extends ScreenAdapter {
 
         batch.setColor(1f, 1f, 1f, alpha);
         batch.draw(region, centerX - size / 2f, centerY - size / 2f, size, size);
+        batch.setColor(Color.WHITE);
+    }
+
+    private void drawEffectSheetRotated(Texture texture, float centerX, float centerY, float size, int frameWidth,
+                                        int frameHeight, float alpha, float progress, float rotation) {
+        int frames = Math.max(1, texture.getWidth() / frameWidth);
+        int frame = Math.min(frames - 1, Math.max(0, (int) (progress * frames)));
+        TextureRegion region = new TextureRegion(texture, frame * frameWidth, 0, frameWidth, frameHeight);
+
+        batch.setColor(1f, 1f, 1f, alpha);
+        batch.draw(region, centerX - size / 2f, centerY - size / 2f, size / 2f, size / 2f,
+            size, size, 1f, 1f, rotation);
         batch.setColor(Color.WHITE);
     }
 
@@ -2122,10 +2191,7 @@ public class GameplayScreen extends ScreenAdapter {
         disposeTexture(tankTexture);
         disposeTexture(sniperTexture);
         disposeTexture(supportTexture);
-        disposeTexture(fireballTexture);
         disposeTexture(frostNovaTexture);
-        disposeTexture(slashArcTexture);
-        disposeTexture(magicBlastTexture);
         disposeTexture(attackAirSheetTexture);
         disposeTexture(dashSheetTexture);
         disposeTexture(fireballSheetTexture);
