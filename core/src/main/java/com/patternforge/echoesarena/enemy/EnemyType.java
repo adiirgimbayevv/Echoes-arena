@@ -2,11 +2,11 @@ package com.patternforge.echoesarena.enemy;
 
 public enum EnemyType {
 
-    GRUNT(40f, 0f, 1f, 50f, 10f, 48f),
-    SWARM(15f, 0f, 0.6f, 75f, 5f, 24f),
-    TANK(160f, 8f, 1.5f, 30f, 20f, 80f),
-    SNIPER(25f, 0f, 0.8f, 40f, 18f, 200f),
-    SUPPORT(30f, 2f, 0.5f, 45f, 6f, 96f);
+    GRUNT(40f, 0f, 1.25f, 50f, 16f, 48f),
+    SWARM(15f, 0f, 0.85f, 75f, 9f, 24f),
+    TANK(160f, 8f, 1.85f, 30f, 30f, 80f),
+    SNIPER(25f, 0f, 1.15f, 40f, 28f, 200f),
+    SUPPORT(30f, 2f, 0.8f, 45f, 11f, 96f);
 
     private final float baseHp;
     private final float baseDefense;

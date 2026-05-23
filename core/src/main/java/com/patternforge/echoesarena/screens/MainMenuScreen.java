@@ -233,6 +233,16 @@ public class MainMenuScreen extends ScreenAdapter {
         root.padLeft(92f);
 
         Label title = new Label("SETTINGS", skin);
+        Label controlsLabel = new Label(
+            "Move: WASD / Arrow Keys\n"
+                + "Dash: Space\n"
+                + "Ranged Homing: Left Mouse Button\n"
+                + "Melee Strike: Right Mouse Button\n"
+                + "Ultimate Fireball: Q\n"
+                + "Ultimate Frost Rift: E\n"
+                + "Pause: Esc",
+            skin
+        );
         TextButton backButton = new TextButton("BACK", skin);
 
         root.add(title).width(360f).pad(10f).left().row();
@@ -240,6 +250,7 @@ public class MainMenuScreen extends ScreenAdapter {
         root.add(musicSlider).width(330f).height(36f).pad(8f).left().row();
         root.add(sfxLabel).width(360f).padTop(12f).left().row();
         root.add(sfxSlider).width(330f).height(36f).pad(8f).left().row();
+        root.add(controlsLabel).width(360f).padTop(14f).left().row();
         root.add(backButton).width(330f).height(56f).padTop(18f).left().row();
         stage.addActor(root);
 

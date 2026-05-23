@@ -50,10 +50,7 @@ public class StageDirector {
         if (state == StageState.RUNNING) {
             waveDirector.update(delta);
 
-            List<Enemy> enemies = waveDirector.getActiveEnemies();
-            for (Enemy enemy : enemies) {
-                enemy.update(delta, player, enemies);
-            }
+            updateEnemies(delta, player);
 
             if (waveDirector.isFinished()) {
                 if (currentStage.hasBoss()) {
@@ -62,6 +59,15 @@ public class StageDirector {
                     state = StageState.STAGE_CLEAR;
                 }
             }
+        } else if (state == StageState.BOSS_PHASE) {
+            updateEnemies(delta, player);
+        }
+    }
+
+    private void updateEnemies(float delta, Player player) {
+        List<Enemy> enemies = waveDirector.getActiveEnemies();
+        for (Enemy enemy : enemies) {
+            enemy.update(delta, player, enemies);
         }
     }
 

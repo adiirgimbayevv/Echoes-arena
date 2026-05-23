@@ -39,7 +39,7 @@ public class EnemyFactory {
             case SWARM:
                 return new SwarmStrategy(12f, 20f, 0.8f);
             case TANK:
-                return new TankStrategy(20f, 80f, 2.0f);
+                return new TankStrategy(42f, 130f, 1.6f);
             case SNIPER:
                 return new RangedStrategy(120f, 60f, 2.5f);
             case SUPPORT:

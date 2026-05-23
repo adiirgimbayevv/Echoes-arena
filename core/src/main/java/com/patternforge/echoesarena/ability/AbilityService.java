@@ -2,6 +2,7 @@ package com.patternforge.echoesarena.ability;
 
 import com.badlogic.gdx.math.Vector2;
 import com.patternforge.echoesarena.combat.CombatSystem;
+import com.patternforge.echoesarena.enemy.EnemyType;
 import com.patternforge.echoesarena.entity.Enemy;
 import com.patternforge.echoesarena.entity.Player;
 
@@ -248,7 +249,7 @@ public class AbilityService {
 
         for (Enemy enemy : enemies) {
             if (enemy.isAlive()
-                && enemy.getPosition().dst(projectile.position) <= Math.max(18f, enemy.getHitboxSize() + FIREBALL_RADIUS)) {
+                && enemy.getPosition().dst(projectile.position) <= getFireballImpactRadius(enemy)) {
                 return true;
             }
         }
@@ -258,7 +259,7 @@ public class AbilityService {
 
     private void explodeFireball(AbilityProjectile projectile, Player player, List<Enemy> enemies) {
         for (Enemy enemy : enemies) {
-            if (enemy.isAlive() && enemy.getPosition().dst(projectile.position) <= FIREBALL_EXPLOSION_RADIUS) {
+            if (enemy.isAlive() && enemy.getPosition().dst(projectile.position) <= getFireballExplosionRadius(enemy)) {
                 combatSystem.abilityHit(
                     player,
                     enemy,
@@ -268,6 +269,26 @@ public class AbilityService {
                 );
             }
         }
+    }
+
+    private float getFireballImpactRadius(Enemy enemy) {
+        float radius = Math.max(18f, enemy.getHitboxSize() + FIREBALL_RADIUS);
+        if (isFinalBoss(enemy)) {
+            radius = Math.max(radius, 110f);
+        }
+        return radius;
+    }
+
+    private float getFireballExplosionRadius(Enemy enemy) {
+        float radius = FIREBALL_EXPLOSION_RADIUS;
+        if (isFinalBoss(enemy)) {
+            radius += 90f;
+        }
+        return radius;
+    }
+
+    private boolean isFinalBoss(Enemy enemy) {
+        return enemy.getType() == EnemyType.TANK && enemy.getCombatStats().getMaxHp() >= 300f;
     }
 
     private void addOrRefreshFrozenTarget(Enemy enemy, float duration) {
