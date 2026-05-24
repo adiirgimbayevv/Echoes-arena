@@ -2,7 +2,7 @@ Echoes Arena
 Version 1.0.0
 
 Team
-Adi
+Irgimbayev Adi, Koshkinbai Nurbek, Akzhigit Dias
 
 Project Overview
 Echoes Arena is a 2D fantasy arena survival game built with Java, libGDX, and the LWJGL3 desktop backend. The player chooses a hero class, enters an arena, survives enemy waves, collects health pickups, uses melee and ranged attacks, and clears staged battles against increasingly dangerous enemies and bosses.
