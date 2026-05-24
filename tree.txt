@@ -1,124 +1,106 @@
-Ñòðóêòóðà ïàïîê
-Ñåðèéíûé íîìåð òîìà: 90C0-DB36
-C:\USERS\ADI20\ONEDRIVE\DESKTOP\ECHOESARENA\ECHOES-ARENA\CORE\SRC\MAIN\JAVA
+C:\Echoes-arena-CLEAN\CORE\SRC\MAIN\JAVA
 L---com
     L---patternforge
         L---echoesarena
-            ¦   EchoesArenaGame.java
-            ¦   
+            Â¦   EchoesArenaGame.java
+            Â¦   
             +---ability
-            ¦       Ability.java
-            ¦       AbilityComboResolver.java
-            ¦       AbilityFactory.java
-            ¦       AbilityService.java
-            ¦       AbilitySlot.java
-            ¦       AbilityType.java
-            ¦       ActiveAbility.java
-            ¦       ElementProgress.java
-            ¦       ElementType.java
-            ¦       PassiveAbility.java
-            ¦       UltimateAbility.java
-            ¦       
+            Â¦       Ability.java
+            Â¦       AbilityFactory.java
+            Â¦       AbilityService.java
+            Â¦       AbilitySlot.java
+            Â¦       AbilityType.java
+            Â¦       ActiveAbility.java
+            Â¦       ElementProgress.java
+            Â¦       ElementType.java
+            Â¦       UltimateAbility.java
+            Â¦       
             +---combat
-            ¦       CollisionSystem.java
-            ¦       CombatSystem.java
-            ¦       DamageCalculator.java
-            ¦       HitData.java
-            ¦       HitType.java
-            ¦       StatusEffect.java
-            ¦       StatusEffectFactory.java
-            ¦       StatusEffectSystem.java
-            ¦       StatusEffectType.java
-            ¦       
+            Â¦       CollisionSystem.java
+            Â¦       CombatSystem.java
+            Â¦       DamageCalculator.java
+            Â¦       HitData.java
+            Â¦       HitType.java
+            Â¦       StatusEffect.java
+            Â¦       StatusEffectFactory.java
+            Â¦       StatusEffectSystem.java
+            Â¦       StatusEffectType.java
+            Â¦       
             +---config
-            ¦       BalanceConfig.java
-            ¦       GameConfig.java
-            ¦       
+            Â¦       BalanceConfig.java
+            Â¦       GameConfig.java
+            Â¦       
             +---core
-            ¦       AssetService.java
-            ¦       AudioService.java
-            ¦       EventBus.java
-            ¦       GameContext.java
-            ¦       ProceduralAssets.java
-            ¦       SaveService.java
-            ¦       ScreenRouter.java
-            ¦       
+            Â¦       AssetService.java
+            Â¦       AudioService.java
+            Â¦       EventBus.java
+            Â¦       GameContext.java
+            Â¦       ProceduralAssets.java
+            Â¦       SaveService.java
+            Â¦       ScreenRouter.java
+            Â¦       
             +---enemy
-            ¦   ¦   EnemyFactory.java
-            ¦   ¦   EnemyState.java
-            ¦   ¦   EnemyStateMachine.java
-            ¦   ¦   EnemyType.java
-            ¦   ¦   
-            ¦   L---ai
-            ¦           ChaseStrategy.java
-            ¦           EnemyStrategy.java
-            ¦           RangedStrategy.java
-            ¦           SupportStrategy.java
-            ¦           SwarmStrategy.java
-            ¦           TankStrategy.java
-            ¦           
+            Â¦   Â¦   EnemyFactory.java
+            Â¦   Â¦   EnemyState.java
+            Â¦   Â¦   EnemyStateMachine.java
+            Â¦   Â¦   EnemyType.java
+            Â¦   Â¦   
+            Â¦   L---ai
+            Â¦           ChaseStrategy.java
+            Â¦           EnemyStrategy.java
+            Â¦           RangedStrategy.java
+            Â¦           SupportStrategy.java
+            Â¦           SwarmStrategy.java
+            Â¦           TankStrategy.java
+            Â¦           
             +---entity
-            ¦       Enemy.java
-            ¦       Player.java
-            ¦       Projectile.java
-            ¦       
-            +---magic
-            ¦       Element.java
-            ¦       ManaSystem.java
-            ¦       
+            Â¦       Enemy.java
+            Â¦       Player.java
+            Â¦       Projectile.java
+            Â¦       
+            Â¦       
             +---player
-            ¦       PlayerBuild.java
-            ¦       PlayerClass.java
-            ¦       PlayerController.java
-            ¦       PlayerSelection.java
-            ¦       PlayerState.java
-            ¦       PlayerStateMachine.java
-            ¦       
+            Â¦       PlayerBuild.java
+            Â¦       PlayerClass.java
+            Â¦       PlayerController.java
+            Â¦       PlayerSelection.java
+            Â¦       PlayerState.java
+            Â¦       PlayerStateMachine.java
+            Â¦       
             +---progression
-            ¦       LevelUpService.java
-            ¦       MetaProgression.java
-            ¦       StatPointAllocator.java
-            ¦       UnlockService.java
-            ¦       UpgradeBranch.java
-            ¦       UpgradeCategory.java
-            ¦       UpgradeOption.java
-            ¦       UpgradePool.java
-            ¦       UpgradeTarget.java
-            ¦       
+            Â¦       LevelUpService.java
+            Â¦       MetaProgression.java
+            Â¦       StatPointAllocator.java
+            Â¦       UnlockService.java
+            Â¦       UpgradeBranch.java
+            Â¦       UpgradeCategory.java
+            Â¦       UpgradeOption.java
+            Â¦       UpgradeTarget.java
+            Â¦       
             +---screens
-            ¦       ArenaObstacle.java
-            ¦       BootScreen.java
-            ¦       GameOverScreen.java
-            ¦       GameplayScreen.java
-            ¦       HealthPickup.java
-            ¦       MainMenuScreen.java
-            ¦       PauseScreen.java
-            ¦       VictoryRoomScreen.java
-            ¦       
+            Â¦       ArenaObstacle.java
+            Â¦       BootScreen.java
+            Â¦       GameOverScreen.java
+            Â¦       GameplayScreen.java
+            Â¦       HealthPickup.java
+            Â¦       MainMenuScreen.java
+            Â¦       PauseScreen.java
+            Â¦       VictoryRoomScreen.java
+            Â¦       
             +---stats
-            ¦       CombatStats.java
-            ¦       MagicalStats.java
-            ¦       ManaProfile.java
-            ¦       PhysicalStats.java
-            ¦       
+            Â¦       CombatStats.java
+            Â¦       MagicalStats.java
+            Â¦       ManaProfile.java
+            Â¦       PhysicalStats.java
+            Â¦       
             +---ui
-            ¦       HudView.java
-            ¦       PauseView.java
-            ¦       SkillStatsView.java
-            ¦       StageResultView.java
-            ¦       UpgradeChoiceView.java
-            ¦       UpgradeTreeView.java
-            ¦       
-            +---weapon
-            ¦       FocusWeapon.java
-            ¦       MeleeWeapon.java
-            ¦       RangedWeapon.java
-            ¦       Weapon.java
-            ¦       WeaponAttackContext.java
-            ¦       WeaponCompatibilityService.java
-            ¦       WeaponFactory.java
-            ¦       WeaponType.java
-            ¦       
+            Â¦       HudView.java
+            Â¦       PauseView.java
+            Â¦       SkillStatsView.java
+            Â¦       StageResultView.java
+            Â¦       UpgradeTreeView.java
+            Â¦       
+            Â¦       
             L---world
                     MapLoader.java
                     SpawnPoint.java
