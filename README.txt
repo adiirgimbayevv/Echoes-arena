@@ -77,3 +77,5 @@ Known Issues
 
 Credits
 Echoes Arena was developed as a final project using Java and libGDX. Visual and audio assets are included in the project assets folder and are used for educational, non-commercial project submission purposes.
+
+Link to Trello: https://trello.com/invite/b/69caab1f4e1df0a40be1ef47/ATTIc229810afdeee5a4f9dde0d53a6134403A934D37/echoes-arena
